@@ -20,40 +20,37 @@ midia SYSTEMTIME ?
 
 caja db "Caja de mensaje",0
 mensaje1 db "NO HAY CLASE EN CURSO",0
-mensaje2 db "FALTA",0
+mensaje2 db "RETRASO",0
 mensaje3 db "ERROR",0
 mensaje4 db "HOY NO TIENE CLASES",0
+mensaje5 db "NO HAY CLASES",0
 
 docente1 db "DOCENTE: CESPEDES GUIZADA MARIA BENITA",0
 materia1 db "MATERIA: INGLES I",0
 aula1 db "AULA: 693B",0
-hora11 db "HORARIO: MARTES 8:15 - 9:45",0
-hora12 db "HORARIO: VIERNES 8:15 - 9:45",0
+hora1 db "HORARIO: 8:15 - 9:45",0
 
 docente2 db "DOCENTE: VALENZUELA MIRANDA ROBERTO",0
 materia2 db "MATERIA: FISICA GENERAL",0
 aula21 db "AULA: 651",0
 aula22 db "AULA: 692C",0
-hora21 db "HORARIO: MARTES 11:15 - 12:45",0
-hora22 db "HORARIO: MIERCOLES 14:15 - 15:45",0
+hora21 db "HORARIO: 11:15 - 12:45",0
+hora22 db "HORARIO: 14:15 - 15:45",0
 
 docente3 db "DOCENTE: USTARIZ VARGAS HERNAN",0
 materia3 db "MATERIA: INTRODUCCION A LA PROGRAMACION",0
-aula31 db "AULA: 607",0
-hora31 db "HORARIO: LUNES 12:45 - 14:15",0
-hora32 db "HORARIO: MIERCOLES 12:45 - 14:15",0
+aula3 db "AULA: 607",0
+hora3 db "HORARIO: 12:45 - 14:15",0
 
 docente4 db "DOCENTE: AGREDA CORRALES LUIS ROBERTO",0
 materia4 db "MATERIA: ARQUITECTURA DE COMPUTADORAS II",0
 aula4 db "AULA: 651",0
-hora41 db "HORARIO: MARTES 15:45 - 17:15",0
-hora42 db "HORARIO: JUEVES 15:45 - 17:15",0
+hora4 db "HORARIO: 15:45 - 17:15",0
 
 docente5 db "DOCENTE: ACHA PEREZ SAMUEL",0
 materia5 db "MATERIA: ARQUITECTURA DE COMPUTADORAS I",0
 aula5 db "AULA: 693B",0
-hora51 db "HORARIO: JUEVES 6:45 - 8:15",0
-hora52 db "HORARIO: SABADO 6:45 - 8:15",0
+hora5 db "HORARIO: 6:45 - 8:15",0
 
 numero dd 0
 numero2 dd 0
@@ -166,9 +163,9 @@ fechaD4:
 	invoke GetLocalTime,midia
 	mov ax,[midia.wDayOfWeek]
 	mov [vardia],eax
-	cmp [vardia], 4
+	cmp [vardia], 2
 	je fechaH4
-	cmp [vardia], 6
+	cmp [vardia], 4
 	je fechaH4
 	jne falta2
 	mov eax,1
@@ -179,9 +176,9 @@ fechaD5:
 	invoke GetLocalTime,midia
 	mov ax,[midia.wDayOfWeek]
 	mov [vardia],eax
-	cmp [vardia], 2
-	je fechaH5
 	cmp [vardia], 4
+	je fechaH5
+	cmp [vardia], 6
 	je fechaH5
 	jne falta2
 	mov eax,1
@@ -192,9 +189,11 @@ fechaH1:	;primer docente
 	invoke GetLocalTime,mifecha
 	mov ax,[mifecha.wHour]
 	mov [varhora],eax
+	cmp [varhora],9
+	je fechaM11
 	cmp [varhora],8
 	je fechaM1
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 fechaM1:
@@ -202,10 +201,20 @@ fechaM1:
 	invoke GetLocalTime,mifecha2
 	mov ax,[mifecha2.wMinute]
 	mov [varmin],eax
-	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
 	cmp [varmin],15
 	jg horamax
-	jne falta
+	jne sinclase
+	mov eax,1
+	jmp finish
+
+fechaM11:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	cmp [varmin],44
+	jng falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 
@@ -221,9 +230,11 @@ fechaH2:	;segundo docente
 	invoke GetLocalTime,mifecha
 	mov ax,[mifecha.wHour]
 	mov [varhora],eax
+	cmp [varhora],12
+	je fechaM2f
 	cmp [varhora],11
 	je fechaM2
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 fechaM2:
@@ -231,10 +242,9 @@ fechaM2:
 	invoke GetLocalTime,mifecha2
 	mov ax,[mifecha2.wMinute]
 	mov [varmin],eax
-	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
 	cmp [varmin],15
 	jg horamax2
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 
@@ -243,15 +253,46 @@ fechaH21:	;segundo docente
 	invoke GetLocalTime,mifecha
 	mov ax,[mifecha.wHour]
 	mov [varhora],eax
+	cmp [varhora],15
+	je fechaM2f
 	cmp [varhora],14
-	je fechaM2
+	je fechaM21
+	jne sinclase
+	mov eax,1
+	jmp finish
+
+fechaM21:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	cmp [varmin],15
+	jg horamax21
+	jne sinclase
+	mov eax,1
+	jmp finish
+
+fechaM2f:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	cmp [varmin],44
+	jng falta
+	jne sinclase
+	mov eax,1
+	jmp finish	
+
+horamax2:
+	cmp [varmin],29
+	jng mostrar2
 	jne falta
 	mov eax,1
 	jmp finish
 	
-horamax2:
+horamax21:
 	cmp [varmin],29
-	jng mostrar2
+	jng mostrar21
 	jne falta
 	mov eax,1
 	jmp finish
@@ -261,9 +302,13 @@ fechaH3:	;tercer docente
 	invoke GetLocalTime,mifecha
 	mov ax,[mifecha.wHour]
 	mov [varhora],eax
+	cmp [varhora],14
+	je fechaM31
+	cmp [varhora],13
+	je falta
 	cmp [varhora],12
 	je fechaM3
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 fechaM3:
@@ -271,13 +316,23 @@ fechaM3:
 	invoke GetLocalTime,mifecha2
 	mov ax,[mifecha2.wMinute]
 	mov [varmin],eax
-	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
 	cmp [varmin],45
 	jg horamax3
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
-
+	
+fechaM31:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	cmp [varmin],14
+	jng falta
+	jne sinclase
+	mov eax,1
+	jmp finish
+	
 horamax3:
 	cmp [varmin],59
 	jng mostrar3
@@ -290,9 +345,13 @@ fechaH4:	;cuarto docente
 	invoke GetLocalTime,mifecha
 	mov ax,[mifecha.wHour]
 	mov [varhora],eax
+	cmp [varhora],17
+	je fechaM41
+	cmp [varhora],16
+	je falta
 	cmp [varhora],15
 	je fechaM4
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 fechaM4:
@@ -300,13 +359,22 @@ fechaM4:
 	invoke GetLocalTime,mifecha2
 	mov ax,[mifecha2.wMinute]
 	mov [varmin],eax
-	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
 	cmp [varmin],45
 	jg horamax4
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 
+fechaM41:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	cmp [varmin],14
+	jng falta
+	jne sinclase
+	mov eax,1
+	jmp finish
 horamax4:
 	cmp [varmin],59
 	jng mostrar4
@@ -319,9 +387,13 @@ fechaH5:	;quinto docente
 	invoke GetLocalTime,mifecha
 	mov ax,[mifecha.wHour]
 	mov [varhora],eax
+	cmp [varhora],8
+	je fechaM51
+	cmp [varhora],7
+	je falta
 	cmp [varhora],6
-	je fechaM4
-	jne falta
+	je fechaM5
+	jne sinclase
 	mov eax,1
 	jmp finish
 fechaM5:
@@ -329,13 +401,23 @@ fechaM5:
 	invoke GetLocalTime,mifecha2
 	mov ax,[mifecha2.wMinute]
 	mov [varmin],eax
-	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
 	cmp [varmin],45
 	jg horamax5
-	jne falta
+	jne sinclase
 	mov eax,1
 	jmp finish
 
+fechaM51:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	cmp [varmin],14
+	jng falta
+	jne sinclase
+	mov eax,1
+	jmp finish
+	
 horamax5:
 	cmp [varmin],59
 	jng mostrar5
@@ -345,20 +427,45 @@ horamax5:
 
 mostrar1:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente1
+	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,materia1
+	invoke SendDlgItemMessage,[hWnd],1006,WM_SETTEXT,10,aula1
+	invoke SendDlgItemMessage,[hWnd],1007,WM_SETTEXT,10,hora1
 	jmp finish
 mostrar2:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente2
+	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,materia2
+	invoke SendDlgItemMessage,[hWnd],1006,WM_SETTEXT,10,aula21
+	invoke SendDlgItemMessage,[hWnd],1007,WM_SETTEXT,10,hora21
+	jmp finish
+	
+mostrar21:
+	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente2
+	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,materia2
+	invoke SendDlgItemMessage,[hWnd],1006,WM_SETTEXT,10,aula22
+	invoke SendDlgItemMessage,[hWnd],1007,WM_SETTEXT,10,hora22
 	jmp finish
 mostrar3:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente3
+	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,materia3
+	invoke SendDlgItemMessage,[hWnd],1006,WM_SETTEXT,10,aula3
+	invoke SendDlgItemMessage,[hWnd],1007,WM_SETTEXT,10,hora3
 	jmp finish
 mostrar4:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente4
+	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,materia4
+	invoke SendDlgItemMessage,[hWnd],1006,WM_SETTEXT,10,aula4
+	invoke SendDlgItemMessage,[hWnd],1007,WM_SETTEXT,10,hora4
 	jmp finish
 mostrar5:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente5
+	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,materia5
+	invoke SendDlgItemMessage,[hWnd],1006,WM_SETTEXT,10,aula5
+	invoke SendDlgItemMessage,[hWnd],1007,WM_SETTEXT,10,hora5
 	jmp finish
 	
+sinclase:
+	invoke MessageBox,[hWnd],mensaje5,caja,MB_OK
+	jmp finish
 falta:
 	invoke MessageBox,[hWnd],mensaje2,caja,MB_OK
 	jmp finish
