@@ -22,39 +22,44 @@ caja db "Caja de mensaje",0
 mensaje1 db "NO HAY CLASE EN CURSO",0
 mensaje2 db "FALTA",0
 mensaje3 db "ERROR",0
+mensaje4 db "HOY NO TIENE CLASES",0
 
 docente1 db "DOCENTE: CESPEDES GUIZADA MARIA BENITA",0
 materia1 db "MATERIA: INGLES I",0
 aula1 db "AULA: 693B",0
-hora11 db "HORARIO: 8:15 - 9:45",0
-
+hora11 db "HORARIO: MARTES 8:15 - 9:45",0
+hora12 db "HORARIO: VIERNES 8:15 - 9:45",0
 
 docente2 db "DOCENTE: VALENZUELA MIRANDA ROBERTO",0
 materia2 db "MATERIA: FISICA GENERAL",0
 aula21 db "AULA: 651",0
 aula22 db "AULA: 692C",0
-hora21 db "HORARIO: 11:15 - 12:45",0
-hora22 db "HORARIO: 14:15 - 15:45",0
+hora21 db "HORARIO: MARTES 11:15 - 12:45",0
+hora22 db "HORARIO: MIERCOLES 14:15 - 15:45",0
 
 docente3 db "DOCENTE: USTARIZ VARGAS HERNAN",0
 materia3 db "MATERIA: INTRODUCCION A LA PROGRAMACION",0
 aula31 db "AULA: 607",0
-hora31 db "HORARIO: 12:45 - 14:15",0
+hora31 db "HORARIO: LUNES 12:45 - 14:15",0
+hora32 db "HORARIO: MIERCOLES 12:45 - 14:15",0
 
 docente4 db "DOCENTE: AGREDA CORRALES LUIS ROBERTO",0
 materia4 db "MATERIA: ARQUITECTURA DE COMPUTADORAS II",0
 aula4 db "AULA: 651",0
-hora41 db "HORARIO: 15:45 - 17:15",0
-hora42 db "HORARIO: 17:15 - 18:45",0
+hora41 db "HORARIO: MARTES 15:45 - 17:15",0
+hora42 db "HORARIO: JUEVES 15:45 - 17:15",0
 
 docente5 db "DOCENTE: ACHA PEREZ SAMUEL",0
 materia5 db "MATERIA: ARQUITECTURA DE COMPUTADORAS I",0
 aula5 db "AULA: 693B",0
-hora51 db "HORARIO: 6:45 - 8:15",0
+hora51 db "HORARIO: JUEVES 6:45 - 8:15",0
+hora52 db "HORARIO: SABADO 6:45 - 8:15",0
 
 numero dd 0
 numero2 dd 0
-var dd 0
+vardia dd 0
+varhora dd 0
+varmin dd 0
 ;Agregar aqui el registro de memoria correspondiente
 section '.code' code readable executable
 
@@ -105,37 +110,261 @@ registrar:
 	je error
 	mov dword [numero],eax
 	cmp eax,98765
-	je fechaM
+	je fechaD1
 	cmp eax,87654
-	je verhora2
+	je fechaD2
 	cmp eax,76543
-	je verhora3
+	je fechaD3
 	cmp eax,65432
-	je verhora4
+	je fechaD4
 	cmp eax,54321
-	je verhora5
+	je fechaD5
 	jne noregistrado
 	mov eax,1
 	jmp finish
 	
-verhora1:
+fechaD1:	;primerdocente
+	xor eax,eax
+	invoke GetLocalTime,midia
+	mov ax,[midia.wDayOfWeek]
+	mov [vardia],eax
+	cmp [vardia], 2
+	je fechaH1
+	cmp [vardia], 5
+	je fechaH1
+	jne falta2
+	mov eax,1
+	jmp finish
+	
+fechaD2:
+	xor eax,eax
+	invoke GetLocalTime,midia
+	mov ax,[midia.wDayOfWeek]
+	mov [vardia],eax
+	cmp [vardia], 2
+	je fechaH2
+	cmp [vardia], 3
+	je fechaH21
+	jne falta2
+	mov eax,1
+	jmp finish
+fechaD3:
+	xor eax,eax
+	invoke GetLocalTime,midia
+	mov ax,[midia.wDayOfWeek]
+	mov [vardia],eax
+	cmp [vardia], 1
+	je fechaH3
+	cmp [vardia], 3
+	je fechaH3
+	jne falta2
+	mov eax,1
+	jmp finish
+
+fechaD4:
+	xor eax,eax
+	invoke GetLocalTime,midia
+	mov ax,[midia.wDayOfWeek]
+	mov [vardia],eax
+	cmp [vardia], 4
+	je fechaH4
+	cmp [vardia], 6
+	je fechaH4
+	jne falta2
+	mov eax,1
+	jmp finish
+
+fechaD5:
+	xor eax,eax
+	invoke GetLocalTime,midia
+	mov ax,[midia.wDayOfWeek]
+	mov [vardia],eax
+	cmp [vardia], 2
+	je fechaH5
+	cmp [vardia], 4
+	je fechaH5
+	jne falta2
+	mov eax,1
+	jmp finish
+	
+fechaH1:	;primer docente
+	xor eax,eax
+	invoke GetLocalTime,mifecha
+	mov ax,[mifecha.wHour]
+	mov [varhora],eax
+	cmp [varhora],8
+	je fechaM1
+	jne falta
+	mov eax,1
+	jmp finish
+fechaM1:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
+	cmp [varmin],15
+	jg horamax
+	jne falta
+	mov eax,1
+	jmp finish
+
+horamax:
+	cmp [varmin],29
+	jng mostrar1
+	jne falta
+	mov eax,1
+	jmp finish
+
+fechaH2:	;segundo docente
+	xor eax,eax
+	invoke GetLocalTime,mifecha
+	mov ax,[mifecha.wHour]
+	mov [varhora],eax
+	cmp [varhora],11
+	je fechaM2
+	jne falta
+	mov eax,1
+	jmp finish
+fechaM2:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
+	cmp [varmin],15
+	jg horamax2
+	jne falta
+	mov eax,1
+	jmp finish
+
+fechaH21:	;segundo docente
+	xor eax,eax
+	invoke GetLocalTime,mifecha
+	mov ax,[mifecha.wHour]
+	mov [varhora],eax
+	cmp [varhora],14
+	je fechaM2
+	jne falta
+	mov eax,1
+	jmp finish
+	
+horamax2:
+	cmp [varmin],29
+	jng mostrar2
+	jne falta
+	mov eax,1
+	jmp finish
+	
+fechaH3:	;tercer docente
+	xor eax,eax
+	invoke GetLocalTime,mifecha
+	mov ax,[mifecha.wHour]
+	mov [varhora],eax
+	cmp [varhora],12
+	je fechaM3
+	jne falta
+	mov eax,1
+	jmp finish
+fechaM3:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
+	cmp [varmin],45
+	jg horamax3
+	jne falta
+	mov eax,1
+	jmp finish
+
+horamax3:
+	cmp [varmin],59
+	jng mostrar3
+	jne falta
+	mov eax,1
+	jmp finish
+	
+fechaH4:	;cuarto docente
+	xor eax,eax
+	invoke GetLocalTime,mifecha
+	mov ax,[mifecha.wHour]
+	mov [varhora],eax
+	cmp [varhora],15
+	je fechaM4
+	jne falta
+	mov eax,1
+	jmp finish
+fechaM4:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
+	cmp [varmin],45
+	jg horamax4
+	jne falta
+	mov eax,1
+	jmp finish
+
+horamax4:
+	cmp [varmin],59
+	jng mostrar4
+	jne falta
+	mov eax,1
+	jmp finish
+	
+fechaH5:	;quinto docente
+	xor eax,eax
+	invoke GetLocalTime,mifecha
+	mov ax,[mifecha.wHour]
+	mov [varhora],eax
+	cmp [varhora],6
+	je fechaM4
+	jne falta
+	mov eax,1
+	jmp finish
+fechaM5:
+	xor eax,eax
+	invoke GetLocalTime,mifecha2
+	mov ax,[mifecha2.wMinute]
+	mov [varmin],eax
+	invoke SetDlgItemInt,[hWnd],1005,[varmin],1
+	cmp [varmin],45
+	jg horamax5
+	jne falta
+	mov eax,1
+	jmp finish
+
+horamax5:
+	cmp [varmin],59
+	jng mostrar5
+	jne falta
+	mov eax,1
+	jmp finish
+
+mostrar1:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente1
 	jmp finish
-verhora2:
-	invoke SendDlgItemMessage,[hWnd],1005,WM_SETTEXT,10,docente2
+mostrar2:
+	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente2
 	jmp finish
-verhora3:
+mostrar3:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente3
 	jmp finish
-verhora4:
+mostrar4:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente4
 	jmp finish
-verhora5:
+mostrar5:
 	invoke SendDlgItemMessage,[hWnd],1003,WM_SETTEXT,10,docente5
 	jmp finish
 	
 falta:
 	invoke MessageBox,[hWnd],mensaje2,caja,MB_OK
+	jmp finish
+	
+falta2:
+	invoke MessageBox,[hWnd],mensaje4,caja,MB_OK
 	jmp finish
 	
 error:
@@ -146,26 +375,6 @@ noregistrado:
 	invoke MessageBox,[hWnd],mensaje1,caja,MB_OK
 	jmp finish
 	
-fechaH:
-	xor eax,eax
-	invoke GetLocalTime,mifecha
-	mov ax,[mifecha.wHour]
-	invoke SetDlgItemInt,[pWnd],1005,eax,1
-	cmp ax,1
-	je verhora1
-	jne falta
-	mov eax,1
-	jmp finish
-fechaM:
-	xor eax,eax
-	invoke GetLocalTime,mifecha2
-	mov ax,[mifecha2.wMinute]
-	invoke SetDlgItemInt,[hWnd],1005,eax,1
-	cmp eax, 1
-	je verhora1
-	jne falta
-	;mov eax,1
-	jmp finish
 jCLOSE:	
 	invoke EndDialog,[hWnd],0
 	mov eax,1
